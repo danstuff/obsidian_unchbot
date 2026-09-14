@@ -1,11 +1,10 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
+	"id": "unchbot",
+	"name": "Unchbot",
 	"version": "1.0.0",
-	"minAppVersion": "1.0.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"minAppVersion": "1.1.0",
+	"description": "Uncheck checklist items on a recurring schedule using %% @uncheck <period> %% comments.",
+	"author": "",
+	"authorUrl": "",
 	"isDesktopOnly": false
 }
