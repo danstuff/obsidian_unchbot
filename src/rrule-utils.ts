@@ -20,8 +20,22 @@ function parsePeriod(periodText: string): Partial<Options> | null {
 	return opts;
 }
 
+/** Returns true if `periodText` is a recognized recurrence rule. */
+export function canParsePeriod(periodText: string): boolean {
+	return parsePeriod(periodText) !== null;
+}
+
+/** Midnight, local time, on the same day as `date`. */
+function startOfLocalDay(date: Date): Date {
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
 /**
- * Finds the most recent recurrence at or before `now`, anchored at `baseline`.
+ * Finds the most recent recurrence at or before `now`, anchored at local
+ * midnight on `baseline`'s day. Anchoring to midnight (rather than the exact
+ * time `baseline` represents) keeps daily/weekly/monthly rules aligned to
+ * calendar days instead of the wall-clock time an item happened to be first
+ * seen or last unchecked.
  * Returns null if `periodText` can't be parsed, or if no occurrence has
  * happened yet.
  */
@@ -32,6 +46,6 @@ export function mostRecentOccurrence(
 ): Date | null {
 	const opts = parsePeriod(periodText);
 	if (!opts) return null;
-	const rule = new RRule({ ...opts, dtstart: baseline });
+	const rule = new RRule({ ...opts, dtstart: startOfLocalDay(baseline) });
 	return rule.before(now, true);
 }

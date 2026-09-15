@@ -25,7 +25,7 @@ Supported phrases follow [rrule's natural language grammar](https://github.com/j
 
 ## Notes & limitations
 
-- Recurrence timing is anchored to whenever Unchbot first saw the item (or, for items created before installing the plugin, whenever it first ran) — not necessarily local midnight. If Obsidian was closed when an item's schedule was due, Unchbot catches up and unchecks it on the next scan rather than firing once per missed occurrence.
+- Recurrence timing is anchored to local midnight on the day Unchbot first saw the item (or, for items created before installing the plugin, the day it first ran) — not the exact time of day it was checked or unchecked. A daily item becomes due again as soon as the calendar day changes, not 24 hours after it was last checked. If Obsidian was closed when an item's schedule was due, Unchbot catches up and unchecks it on the next scan rather than firing once per missed occurrence.
 - An item's identity is derived from its file path and its text (ignoring checked state). Renaming the item or moving it to another file resets its schedule.
 - Unchbot only reads/writes files inside the vault and makes no network requests.
 

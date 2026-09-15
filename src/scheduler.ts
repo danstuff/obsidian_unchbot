@@ -1,6 +1,6 @@
 import type UnchbotPlugin from './main';
 import { extractUncheckPeriod, itemKey, parseChecklistLine, setChecked } from './checklist';
-import { mostRecentOccurrence } from './rrule-utils';
+import { canParsePeriod, mostRecentOccurrence } from './rrule-utils';
 import { ItemState } from './types';
 
 export interface UncheckPassResult {
@@ -42,7 +42,7 @@ export async function runUncheckPass(plugin: UnchbotPlugin): Promise<UncheckPass
 
 			const occurrence = mostRecentOccurrence(period, baseline, nowDate);
 			if (!occurrence) {
-				if (!prior) parseErrors.add(period);
+				if (!canParsePeriod(period)) parseErrors.add(period);
 				nextItemState[key] = prior ?? { lastProcessed: now };
 				continue;
 			}
