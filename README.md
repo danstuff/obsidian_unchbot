@@ -17,6 +17,21 @@ Whenever you check one of these items off, Unchbot leaves it checked until its n
 
 Supported phrases follow [rrule's natural language grammar](https://github.com/jkbrzt/rrule), e.g. `every day`, `every 2 weeks`, `every weekday`, `every month on the 1st and 15th`, `every year in June`, `every week on Monday, Wednesday, and Friday`.
 
+### Section-level defaults
+
+Instead of tagging every item individually, put a `%% @uncheck <period> %%` comment on its own line below a header. It becomes the default for every checklist item in that section (including subsections), unless an item overrides it with its own `@uncheck` comment:
+
+```markdown
+## Daily chores
+%% @uncheck every day %%
+
+- [ ] Water the plants
+- [ ] Take out the trash
+- [ ] Renew passport %% @uncheck every year %%
+```
+
+Here, "Water the plants" and "Take out the trash" both uncheck daily, while "Renew passport" overrides the section default and uses its own yearly schedule. A section's default applies until the next header of the same or higher level.
+
 ## Usage
 
 - Unchbot scans the vault automatically on a timer (configurable in **Settings → Unchbot**, default every 15 minutes) and once shortly after Obsidian starts.

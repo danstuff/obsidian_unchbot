@@ -1,7 +1,28 @@
 import type UnchbotPlugin from './main';
-import { extractUncheckPeriod, itemKey, parseChecklistLine, setChecked } from './checklist';
+import {
+	extractStandaloneUncheckPeriod,
+	extractUncheckPeriod,
+	headerLevel,
+	itemKey,
+	parseChecklistLine,
+	setChecked,
+} from './checklist';
 import { canParsePeriod, mostRecentOccurrence } from './rrule-utils';
 import { ItemState } from './types';
+
+interface HeaderSection {
+	level: number;
+	/** The most recently seen standalone `@uncheck` period under this header, if any. */
+	period: string | null;
+}
+
+/** Finds the innermost enclosing header section that has a period set. */
+function sectionPeriod(stack: HeaderSection[]): string | null {
+	for (let i = stack.length - 1; i >= 0; i--) {
+		if (stack[i]!.period !== null) return stack[i]!.period;
+	}
+	return null;
+}
 
 export interface UncheckPassResult {
 	filesChanged: number;
@@ -29,12 +50,31 @@ export async function runUncheckPass(plugin: UnchbotPlugin): Promise<UncheckPass
 
 		const lines = content.split('\n');
 		const dueAndChecked = new Set<string>();
+		const sectionStack: HeaderSection[] = [];
 
 		for (const line of lines) {
-			const period = extractUncheckPeriod(line);
-			if (!period) continue;
+			const level = headerLevel(line);
+			if (level !== null) {
+				while (sectionStack.length && sectionStack[sectionStack.length - 1]!.level >= level) {
+					sectionStack.pop();
+				}
+				sectionStack.push({ level, period: null });
+				continue;
+			}
+
+			const standalonePeriod = extractStandaloneUncheckPeriod(line);
+			if (standalonePeriod !== null) {
+				if (sectionStack.length > 0) {
+					sectionStack[sectionStack.length - 1]!.period = standalonePeriod;
+				}
+				continue;
+			}
+
 			const match = parseChecklistLine(line);
 			if (!match) continue;
+
+			const period = extractUncheckPeriod(line) ?? sectionPeriod(sectionStack);
+			if (!period) continue;
 
 			const key = itemKey(file.path, match);
 			const prior = plugin.data.itemState[key];
